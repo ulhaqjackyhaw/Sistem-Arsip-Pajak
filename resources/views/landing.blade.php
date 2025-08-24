@@ -1,41 +1,47 @@
 <x-guest-layout>
     <div class="text-center">
-        <h1 class="text-3xl font-bold mb-3 text-gray-800">Portal Bukti Pajak</h1>
-        <p class="text-gray-600 mb-8">Silakan pilih tipe login Anda</p>
+        <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+            Portal Bukti Pajak
+        </h1>
+        <p class="mt-4 text-lg text-slate-600">
+            Silakan masuk sesuai dengan peran Anda.
+        </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
-            <!-- Login Petugas/Admin -->
+        <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:mx-auto lg:max-w-2xl">
             <a href="{{ route('login') }}"
-               class="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-lg hover:border-blue-600 transition duration-300">
-                <div class="flex flex-col items-center">
-                    <div class="p-4 rounded-full bg-blue-600 text-white mb-4 group-hover:scale-110 transition">
-                        <!-- Icon Petugas/Admin -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                   d="M5.121 17.804A4 4 0 0112 15h0a4 4 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-semibold text-gray-800">Login Petugas/Admin</h2>
-                    <p class="text-sm text-gray-500 mt-1">Masuk sebagai petugas atau admin</p>
+               class="group relative flex flex-col items-center justify-center rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:ring-indigo-500">
+
+                <div class="mb-4 rounded-lg bg-indigo-500 p-4 text-white transition-transform duration-300 group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="h-9 w-9">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M8.25 21V3.75h7.5V21M8.25 3.75h7.5m-7.5 4.5h7.5m-7.5 4.5h7.5m-7.5 4.5h7.5M12 21v-3.75" />
+                    </svg>
                 </div>
+                <h2 class="text-xl font-semibold text-slate-800">
+                    Tax Officer / Admin
+                </h2>
+                <p class="mt-1 text-base text-slate-500">
+                    Masuk untuk manajemen.
+                </p>
             </a>
 
-            <!-- Login Vendor -->
             <a href="{{ route('vendor.login.form') }}"
-               class="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-lg hover:border-green-600 transition duration-300">
-                <div class="flex flex-col items-center">
-                    <div class="p-4 rounded-full bg-green-600 text-white mb-4 group-hover:scale-110 transition">
-                        <!-- Icon Vendor -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                   d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM4 6h16M4 10h16M4 14h16M4 18h16"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-semibold text-gray-800">Login Vendor (NPWP)</h2>
-                    <p class="text-sm text-gray-500 mt-1">Masuk dengan akun vendor/NPWP</p>
+               class="group relative flex flex-col items-center justify-center rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:ring-teal-500">
+
+                <div class="mb-4 rounded-lg bg-teal-500 p-4 text-white transition-transform duration-300 group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="h-9 w-9">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M13.5 21v-7.5A.75.75 0 0114.25 12h.75c.414 0 .75.336.75.75v7.5m-4.5 0v-7.5A.75.75 0 0110.5 12h.75c.414 0 .75.336.75.75v7.5m-4.5 0v-7.5A.75.75 0 016.75 12h.75c.414 0 .75.336.75.75v7.5m6-15H5.25v7.5H18.75V6M18.75 6H19.5v15h-15V6h.75m1.5-1.5h10.5a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75H7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75z" />
+                    </svg>
                 </div>
+                <h2 class="text-xl font-semibold text-slate-800">
+                    Vendor (NPWP)
+                </h2>
+                <p class="mt-1 text-base text-slate-500">
+                    Masuk dengan akun vendor.
+                </p>
             </a>
         </div>
     </div>

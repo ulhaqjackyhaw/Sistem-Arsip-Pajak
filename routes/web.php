@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VendorLoginController;
+use App\Http\Controllers\Vendor\DocumentController;
 
 use App\Http\Controllers\Admin\VendorController as AdminVendor;
 use App\Http\Controllers\Officer\DocumentController as OfficerDoc;
@@ -44,7 +45,7 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class . ':admin'
 
         Route::put('vendors/{vendor}/password', [\App\Http\Controllers\Admin\VendorController::class, 'updatePassword'])
         ->name('vendors.password.update');
-
+        
         // Import / Export
         Route::post('vendors/import', [\App\Http\Controllers\Admin\VendorController::class, 'import'])->name('vendors.import');
         Route::get('vendors/export', [\App\Http\Controllers\Admin\VendorController::class, 'export'])->name('vendors.export');
@@ -72,10 +73,13 @@ Route::middleware(['auth', RoleMiddleware::class . ':officer,admin'])
 // ===================== VENDOR =====================
 Route::middleware(['auth', RoleMiddleware::class . ':vendor'])
     ->prefix('vendor')->name('vendor.')->group(function () {
-        Route::get('documents', [VendorDoc::class, 'index'])->name('documents.index');
+        Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
 
         // Vendor boleh unduh dokumennya sendiri (re-use OfficerDoc@download)
         Route::get('documents/{document}/download', [OfficerDoc::class, 'download'])->name('documents.download');
+        
+        // Add the route for downloading multiple files as ZIP
+        Route::post('documents/download-zip', [DocumentController::class, 'downloadZip'])->name('documents.downloadZip');
     });
 
 // ===================== DASHBOARD (post-login) =====================
