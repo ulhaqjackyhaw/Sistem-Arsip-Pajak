@@ -62,7 +62,7 @@
                            class="w-full sm:w-64 rounded-md border-gray-300 pl-9 focus:border-blue-500 focus:ring-blue-500 text-sm">
                 </div>
                 @if(request('q'))
-                    <a href="{{ route('officer.vendors.index') }}" class="text-sm text-gray-600 hover:text-gray-800">Reset</a>
+                    <a href="{{ route('officer.vendors.index') }}" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">Back</a>
                 @endif
             </form>
         </div>

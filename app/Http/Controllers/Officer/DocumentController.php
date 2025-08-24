@@ -10,7 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DocumentController extends Controller
 {
@@ -28,7 +28,7 @@ class DocumentController extends Controller
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($w) use ($q) {
                     $w->where('npwp', 'like', "%{$q}%")
-                      ->orWhere('name', 'like', "%{$q}%");
+                        ->orWhere('name', 'like', "%{$q}%");
                 });
             })
             ->withCount('documents')
@@ -60,27 +60,27 @@ class DocumentController extends Controller
     public function store(StoreDocumentRequest $request): RedirectResponse
     {
         $vendor = Vendor::findOrFail($request->vendor_id);
-        $file   = $request->file('file');
+        $file = $request->file('file');
 
         // Hash sebelum dipindah (stabil)
-        $sha256     = hash_file('sha256', $file->getRealPath());
+        $sha256 = hash_file('sha256', $file->getRealPath());
         $storedName = uniqid('doc_') . '.' . $file->getClientOriginalExtension();
-        $dir        = "bukti_pajak/{$vendor->npwp}/{$request->period}";
+        $dir = "bukti_pajak/{$vendor->npwp}/{$request->period}";
 
         // Simpan ke disk "private"
         $path = $file->storeAs($dir, $storedName, 'private');
 
         // Simpan metadata
         Document::create([
-            'vendor_id'     => $vendor->id,
-            'uploaded_by'   => $request->user()->id,
-            'period'        => $request->period,
+            'vendor_id' => $vendor->id,
+            'uploaded_by' => $request->user()->id,
+            'period' => $request->period,
             'original_name' => $file->getClientOriginalName(),
-            'stored_name'   => $storedName,
-            'mime'          => $file->getMimeType() ?: $file->getClientMimeType(),
-            'size'          => $file->getSize(),
-            'hash'          => $sha256,
-            'path'          => $path,     // contoh: bukti_pajak/NPWP/2025-08/doc_xxx.pdf
+            'stored_name' => $storedName,
+            'mime' => $file->getMimeType() ?: $file->getClientMimeType(),
+            'size' => $file->getSize(),
+            'hash' => $sha256,
+            'path' => $path,     // contoh: bukti_pajak/NPWP/2025-08/doc_xxx.pdf
             // 'disk'       => 'private', // hanya isi jika kolom 'disk' memang ada di tabel
         ]);
 
@@ -90,7 +90,7 @@ class DocumentController extends Controller
     /**
      * Unduh dokumen secara privat (via controller).
      */
-    public function download(Document $document): StreamedResponse
+    public function download(Document $document): BinaryFileResponse
     {
         $disk = $document->disk ?? 'private';
 
@@ -100,7 +100,8 @@ class DocumentController extends Controller
 
         $downloadName = $document->original_name ?: $document->stored_name;
 
-        return Storage::disk($disk)->download($document->path, $downloadName);
+        $filePath = Storage::disk($disk)->path($document->path);
+        return response()->download($filePath, $downloadName);
     }
 
     /**

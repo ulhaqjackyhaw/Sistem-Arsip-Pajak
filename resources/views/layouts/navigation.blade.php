@@ -1,97 +1,68 @@
-{{-- resources/views/layouts/navigation.blade.php --}}
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+{{-- layouts/navigation.blade.php --}}
+<nav class="bg-white shadow-sm">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">
+            {{-- Kiri: Logo & Menu Utama --}}
             <div class="flex">
-                <div class="shrink-0 flex items-center">
+                {{-- Logo --}}
+                <div class="flex flex-shrink-0 items-center">
                     <a href="{{ route('home') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        {{-- Ganti dengan logo SVG atau gambar Anda --}}
+                        <svg class="h-8 w-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" />
+                        </svg>
                     </a>
                 </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                {{-- Menu Navigasi (Desktop) --}}
+                <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
                     @auth
                         @php $role = auth()->user()->role ?? null; @endphp
                         @if(in_array($role, ['officer','admin']))
-                            <x-nav-link :href="route('officer.vendors.index')" :active="request()->routeIs('officer.vendors.*')">Officer Vendor</x-nav-link>
-                            <x-nav-link :href="route('officer.bulk.form')" :active="request()->routeIs('officer.bulk.form')">Bulk Upload</x-nav-link>
+                            <a href="{{ route('officer.vendors.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('officer.vendors.*') ? 'border-blue-500 text-slate-900' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }} text-sm font-medium">
+                                Officer Vendor
+                            </a>
+                             <a href="{{ route('officer.bulk.form') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('officer.bulk.form') ? 'border-blue-500 text-slate-900' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }} text-sm font-medium">
+                                Bulk Upload
+                            </a>
                         @endif
                         @if($role === 'admin')
-                            <x-nav-link :href="route('admin.vendors.index')" :active="request()->routeIs('admin.vendors.*')">Admin Vendor</x-nav-link>
+                             <a href="{{ route('admin.vendors.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.vendors.*') ? 'border-blue-500 text-slate-900' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }} text-sm font-medium">
+                                Admin Vendor
+                            </a>
                         @endif
                         @if($role === 'vendor')
-                            <x-nav-link :href="route('vendor.documents.index')" :active="request()->routeIs('vendor.documents.*')">Dokumen Saya</x-nav-link>
+                             <a href="{{ route('vendor.documents.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('vendor.documents.*') ? 'border-blue-500 text-slate-900' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700' }} text-sm font-medium">
+                                Dokumen Saya
+                            </a>
                         @endif
                     @endauth
                 </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center sm:ml-6">
+            {{-- Kanan: Pengguna & Auth --}}
+            <div class="hidden sm:ml-6 sm:flex sm:items-center">
                 @auth
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                <div>{{ Auth::user()->name }}</div>
-                                <div class="ml-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                                </div>
-                            </button>
-                        </x-slot>
-                        <x-slot name="content">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                            </form>
-                        </x-slot>
-                    </x-dropdown>
-                @endauth
-            </div>
-
-            <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+                    <span class="text-sm font-medium text-slate-700 mr-4">
+                        Halo, {{ auth()->user()->name }}
+                    </span>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center justify-center rounded-md border border-transparent bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Keluar
+                        </button>
+                    </form>
+                @else
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('login') }}" class="text-sm font-medium text-slate-600 hover:text-blue-600">Masuk</a>
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Daftar
+                            </a>
+                        @endif
+                    </div>
+                @endguest
             </div>
         </div>
-    </div>
-
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-             @auth
-                @php $role = auth()->user()->role ?? null; @endphp
-                @if(in_array($role, ['officer','admin']))
-                    <x-responsive-nav-link :href="route('officer.vendors.index')" :active="request()->routeIs('officer.vendors.*')">Officer Vendor</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('officer.bulk.form')" :active="request()->routeIs('officer.bulk.form')">Bulk Upload</x-responsive-nav-link>
-                @endif
-                @if($role === 'admin')
-                     <x-responsive-nav-link :href="route('admin.vendors.index')" :active="request()->routeIs('admin.vendors.*')">Admin Vendor</x-responsive-nav-link>
-                @endif
-                @if($role === 'vendor')
-                     <x-responsive-nav-link :href="route('vendor.documents.index')" :active="request()->routeIs('vendor.documents.*')">Dokumen Saya</x-responsive-nav-link>
-                @endif
-            @endauth
-        </div>
-
-        @auth
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-            <div class="mt-3 space-y-1">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-        @endauth
     </div>
 </nav>
