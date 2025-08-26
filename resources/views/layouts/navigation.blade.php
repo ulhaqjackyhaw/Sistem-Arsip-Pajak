@@ -1,8 +1,8 @@
 {{-- layouts/navigation.blade.php --}}
-<nav class="bg-white shadow-sm">
+<nav class="bg-white shadow-sm" x-data="{ open: false }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">
-            {{-- Kiri: Logo & Menu Utama --}}
+            {{-- Kiri: Logo & Menu Utama (Desktop) --}}
             <div class="flex">
                 {{-- Logo --}}
                 <div class="flex flex-shrink-0 items-center">
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            {{-- Kanan: Pengguna & Auth --}}
+            {{-- Kanan: Pengguna & Auth (Desktop) --}}
             <div class="hidden sm:ml-6 sm:flex sm:items-center">
                 @auth
                     <span class="text-sm font-medium text-slate-700 mr-4">
@@ -63,6 +63,75 @@
                     </div>
                 @endguest
             </div>
+
+            {{-- Tombol hamburger menu (Mobile) --}}
+            <div class="-mr-2 flex items-center sm:hidden">
+                <button type="button" @click="open = ! open" class="inline-flex items-center justify-center rounded-md p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    {{-- Ikon ketika menu tertutup --}}
+                    <svg x-show="!open" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                    {{-- Ikon ketika menu terbuka --}}
+                    <svg x-show="open" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Menu mobile, tampilkan/sembunyikan berdasarkan status menu --}}
+    <div class="sm:hidden" x-show="open" x-transition:enter="duration-150 ease-out" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="duration-100 ease-in" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+        <div class="space-y-1 pt-2 pb-3">
+            {{-- Link Navigasi Mobile --}}
+            @auth
+                @php $role = auth()->user()->role ?? null; @endphp
+                @if(in_array($role, ['officer','admin']))
+                    <a href="{{ route('officer.vendors.index') }}" class="block px-3 py-2 text-base font-medium {{ request()->routeIs('officer.vendors.*') ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                        Officer Vendor
+                    </a>
+                    <a href="{{ route('officer.bulk.form') }}" class="block px-3 py-2 text-base font-medium {{ request()->routeIs('officer.bulk.form') ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                        Bulk Upload
+                    </a>
+                @endif
+                @if($role === 'admin')
+                    <a href="{{ route('admin.vendors.index') }}" class="block px-3 py-2 text-base font-medium {{ request()->routeIs('admin.vendors.*') ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                        Admin Vendor
+                    </a>
+                @endif
+                @if($role === 'vendor')
+                    <a href="{{ route('vendor.documents.index') }}" class="block px-3 py-2 text-base font-medium {{ request()->routeIs('vendor.documents.*') ? 'bg-blue-50 border-l-4 border-blue-500 text-blue-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                        Dokumen Saya
+                    </a>
+                @endif
+            @endauth
+        </div>
+
+        {{-- Bagian Auth Mobile --}}
+        <div class="border-t border-slate-200 pt-4 pb-3">
+            @auth
+                <div class="flex items-center px-4">
+                    <span class="text-base font-medium text-slate-800">
+                        Halo, {{ auth()->user()->name }}
+                    </span>
+                </div>
+                <div class="mt-3 space-y-1">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="block w-full px-4 py-2 text-left text-base font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+                            Keluar
+                        </button>
+                    </form>
+                </div>
+            @else
+                <div class="space-y-1">
+                    <a href="{{ route('login') }}" class="block w-full px-4 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-blue-600">Masuk</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="block w-full px-4 py-2 text-base font-medium text-blue-600 hover:bg-slate-100 hover:text-blue-700">Daftar</a>
+                    @endif
+                </div>
+            @endguest
         </div>
     </div>
 </nav>

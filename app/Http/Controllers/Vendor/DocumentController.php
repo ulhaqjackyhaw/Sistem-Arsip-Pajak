@@ -51,21 +51,21 @@ class DocumentController extends Controller
     }
 
     // Method untuk menangani pengunduhan ZIP dari dokumen yang dipilih
-    public function downloadZip(Request $request)
+  public function downloadZip(Request $request)
 {
     $user = $request->user();
 
-    // Cari vendor dengan logika yang sama seperti di metode index
+    // 1. Mencari vendor berdasarkan user yang sedang login
     $vendor = Vendor::query()
         ->when(!empty($user->vendor_id ?? null), fn($q) => $q->where('id', $user->vendor_id))
         ->when(empty($user->vendor_id ?? null) && !empty($user->npwp ?? null), fn($q) => $q->where('npwp', preg_replace('/\D/', '', $user->npwp)))
         ->first();
 
-    // Jika vendor tidak ditemukan, lempar pesan kesalahan
     if (!$vendor) {
         return redirect()->route('vendor.documents.index')->with('error', 'Akun vendor tidak terhubung.');
     }
 
+    // 2. Mengambil dokumen yang dipilih
     $docs = Document::whereIn('id', $request->input('docs'))
                     ->where('vendor_id', $vendor->id)
                     ->get();
@@ -78,37 +78,40 @@ class DocumentController extends Controller
     $zipFileName = 'dokumen_' . now()->timestamp . '.zip';
     $zipPath = storage_path('app/public/zip_temp/' . $zipFileName);
 
-    // Pastikan direktori zip_temp ada
     Storage::disk('public')->makeDirectory('zip_temp');
 
-    // Coba buka file ZIP
-    if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-        Log::error('Gagal membuat file ZIP pada path: ' . $zipPath);
+    $res = $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+    if ($res !== true) {
+        $error = "Tidak dapat membuat file ZIP. Kode error: " . $res . " - " . $this->getZipErrorMessage($res);
+        Log::error($error . ' pada path: ' . $zipPath);
         return redirect()->route('vendor.documents.index')->with('error', 'Tidak dapat membuat file ZIP.');
     }
+    
+    // 3. Mengambil NPWP dari vendor dan membersihkannya
+    $vendorNpwp = preg_replace('/\D/', '', $vendor->npwp ?? null);
 
-    // Tambahkan file-file ke dalam ZIP
+    // 4. Menambahkan file ke ZIP
     foreach ($docs as $document) {
-        // PERBAIKAN: Gunakan stored_name dan bangun jalur file secara manual
-        $filePath = 'documents/vendor/' . $document->vendor_id . '/' . $document->stored_name;
+        // ==================================================================
+        // PERBAIKAN: Menambahkan periode ke dalam jalur file
+        // ==================================================================
+        $filePath = 'bukti_pajak/' . $vendorNpwp . '/' . $document->period . '/' . $document->stored_name;
 
-        // Pastikan jalur file tidak null dan file ada sebelum ditambahkan ke ZIP
-        if ($document->stored_name && Storage::disk('local')->exists($filePath)) {
-            // Log jika file berhasil ditambahkan
+        // Memeriksa keberadaan file di disk 'private'
+        if ($document->stored_name && Storage::disk('private')->exists($filePath)) {
             Log::info('Menambahkan file ke ZIP: ' . $filePath);
-            $zip->addFile(Storage::path($filePath), $document->original_name);
+            $zip->addFile(Storage::disk('private')->path($filePath), $document->original_name);
         } else {
-            // Catat jika file tidak ada atau nama file kosong
             Log::warning('Dokumen dengan ID ' . $document->id . ' dilewati. Jalur file tidak valid: ' . $filePath);
         }
     }
 
-    // Menutup file ZIP
     $zip->close();
 
-    // Cek apakah file ZIP telah dibuat dan kembalikan ke pengguna
+    // 5. Mengirimkan file ZIP untuk diunduh
     if (file_exists($zipPath)) {
-        return response()->download($zipPath)->deleteFileAfterSend(true);
+        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 
     return redirect()->route('vendor.documents.index')->with('error', 'Terjadi kesalahan saat membuat file ZIP.');
