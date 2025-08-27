@@ -1,6 +1,6 @@
 {{-- layouts/app.blade.php --}}
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-sky-50">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,7 +21,7 @@
         @include('layouts.navigation')
 
         @isset($header)
-            <header class="bg-white shadow-sm">
+            <header class="bg-blue shadow-sm border-b border-slate-200">
                 <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>
@@ -29,8 +29,8 @@
         @endisset
 
         {{-- Konten Utama --}}
-        <main class="flex-grow py-10">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
+        <main class="flex-grow">
+            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
 
                 {{-- Flash Message (Opsional) --}}
                 @if (session('success') || session('error'))
@@ -38,7 +38,7 @@
                         $isError = session()->has('error');
                         $message = session('success') ?? session('error');
                     @endphp
-                    <div class="rounded-lg {{ $isError ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700' }} p-4 mx-4 sm:mx-0">
+                    <div class="rounded-lg {{ $isError ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700' }} p-4 mx-4 sm:mx-0 mb-6 border {{ $isError ? 'border-red-200' : 'border-green-200' }}">
                         <div class="flex">
                             <div class="flex-shrink-0">
                                 @if($isError)
@@ -47,8 +47,8 @@
                                     </svg>
                                 @else
                                      <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-                                    </svg>
+                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                                     </svg>
                                 @endif
                             </div>
                             <div class="ml-3">
@@ -59,9 +59,8 @@
                 @endif
 
                 {{-- Slot Konten Utama --}}
-                <div class="bg-white p-6 sm:p-8 shadow-sm sm:rounded-lg mx-4 sm:mx-0">
-                    {{ $slot }}
-                </div>
+                {{-- Wrapper putihnya kita pindah ke file view masing-masing --}}
+                {{ $slot }}
             </div>
         </main>
 
@@ -76,5 +75,7 @@
     </div>
 
     @stack('scripts')
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

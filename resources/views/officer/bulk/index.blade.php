@@ -1,193 +1,194 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between gap-3">
-            <div>
-                <h2 class="font-semibold text-xl text-gray-800">Bulk Upload Bukti Pajak</h2>
-                <p class="text-sm text-gray-500">Unggah banyak PDF sekaligus. Sistem akan menyortir otomatis berdasarkan NPWP & periode dari nama file.</p>
+        {{-- Header dengan gaya gelap yang konsisten --}}
+        <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-extrabold text-2xl text-white leading-tight">Bulk Upload Bukti Pajak</h2>
+                    <p class="text-base text-slate-300 mt-1">Unggah banyak PDF sekaligus. Sistem akan menyortir otomatis.</p>
+                </div>
+                <a href="{{ route('officer.vendors.index') }}"
+                   class="inline-flex items-center gap-2 rounded-lg border border-slate-500 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Daftar Vendor
+                </a>
             </div>
-            <a href="{{ route('officer.vendors.index') }}"
-               class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm hover:bg-gray-50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                Daftar Vendor
-            </a>
         </div>
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- Petunjuk pola nama --}}
-            <div class="bg-white shadow-sm sm:rounded-2xl p-6 border border-gray-100">
-                <h3 class="font-semibold text-gray-800">Format nama file</h3>
-                <p class="text-sm text-gray-600 mt-1">Wajib diawali: <span class="font-semibold">BLU_</span> atau <span class="font-semibold">BPU_</span>, lalu <span class="font-semibold">NPWP</span>. Periode akan otomatis dicari dalam nama file.</p>
-                <ul class="mt-3 grid sm:grid-cols-2 gap-2 text-sm">
-                    <li class="px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
-                        <span class="font-mono text-gray-800">BLU_&lt;NPWP&gt;_&lt;YYYY-MM&gt;.pdf</span>
-                        <div class="text-xs text-gray-500">Contoh: BLU_9876543210987654_2025-08.pdf</div>
+            {{-- Petunjuk format file dibuat menonjol dengan warna latar --}}
+            <div class="bg-sky-50 shadow-lg sm:rounded-2xl p-6 border border-sky-200 ring-4 ring-sky-100">
+                <div class="flex items-start gap-4">
+                    <div class="shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                        </svg>
+                    </div>
+                    <div>
+                         <h3 class="font-bold text-lg text-gray-900">Perhatian: Format Nama File Wajib Sesuai</h3>
+                         <p class="text-base text-gray-600 mt-1 leading-relaxed">
+                             Sistem hanya akan memproses file PDF yang namanya diawali <code class="font-bold text-sky-700">BLU_</code> atau <code class="font-bold text-sky-700">BPU_</code>, diikuti langsung dengan **NPWP** dan mengandung **periode** tanggal.
+                         </p>
+                    </div>
+                </div>
+                <ul class="mt-4 grid sm:grid-cols-2 gap-3 text-base">
+                    {{-- Contoh format dengan font lebih besar --}}
+                    <li class="px-4 py-3 rounded-lg bg-slate-50 border border-slate-200">
+                        <span class="font-mono text-slate-800">BLU_&lt;NPWP&gt;_&lt;YYYY-MM&gt;.pdf</span>
+                        <div class="text-sm text-slate-500 mt-1">Contoh: BLU_9876543210987654_2025-08.pdf</div>
                     </li>
-                    <li class="px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
-                        <span class="font-mono text-gray-800">BPU_&lt;NPWP&gt;_&lt;MM&gt;_&lt;YYYY&gt;_....pdf</span>
-                        <div class="text-xs text-gray-500">Contoh: BPU_0012025888542000_07_2025_....pdf</div>
-                    </li>
-                    <li class="px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
-                        <span class="font-mono text-gray-800">BLU_&lt;NPWP&gt;_&lt;YYYYMM&gt;.pdf</span>
-                        <div class="text-xs text-gray-500">Contoh: BLU_9876543210987654_202508.pdf</div>
-                    </li>
-                    <li class="px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
-                        <span class="font-mono text-gray-800">BLU_&lt;NPWP&gt; &lt;NAMA PT&gt;_&lt;DDMMYYYY&gt;.pdf</span>
-                        <div class="text-xs text-gray-500">Contoh: BLU_9876543210987654 PT ABC_08052025.pdf</div>
+                    <li class="px-4 py-3 rounded-lg bg-slate-50 border border-slate-200">
+                        <span class="font-mono text-slate-800">BPU_&lt;NPWP&gt;_&lt;MM&gt;_&lt;YYYY&gt;....pdf</span>
+                        <div class="text-sm text-slate-500 mt-1">Contoh: BPU_0012025888542000_07_2025_....pdf</div>
                     </li>
                 </ul>
             </div>
 
             {{-- Form upload --}}
-            <div class="bg-white shadow-sm sm:rounded-2xl p-6 border border-gray-100">
+            <div class="bg-white shadow-lg sm:rounded-2xl p-6 border border-gray-100">
                 <form method="POST" action="{{ route('officer.bulk.upload') }}" enctype="multipart/form-data">
                     @csrf
 
                     @if ($errors->any())
-                        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-                            <ul class="list-disc pl-5 space-y-0.5">
+                        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-base">
+                            <ul class="list-disc pl-5 space-y-1">
                                 @foreach ($errors->all() as $e) <li>{{ $e }}</li> @endforeach
                             </ul>
                         </div>
                     @endif
 
-                        {{-- === DROPZONE (Pilih PDF saja) === --}}
-<div id="dropzone"
-     class="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center transition">
+                    {{-- Dropzone dibuat lebih interaktif --}}
+                    <div id="dropzone" class="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center transition flex flex-col items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <input id="files" name="files[]" type="file" accept="application/pdf,.pdf" multiple class="hidden">
+                        <button type="button" id="filePicker" class="inline-flex items-center gap-2 rounded-lg bg-sky-600 text-white px-5 py-2.5 text-base font-semibold shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 -ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Pilih File PDF
+                        </button>
+                        <p class="mt-3 text-base text-gray-700">
+                            atau <b>tarik & letakkan</b> file ke area ini.
+                        </p>
+                        <p class="text-sm text-gray-500 mt-1">Maks 300 file • PDF saja • 20 MB per file</p>
+                    </div>
 
-    {{-- input utama yang DIKIRIM ke server --}}
-    <input id="files" name="files[]" type="file" accept="application/pdf,.pdf" multiple class="hidden">
-
-    <div class="flex items-center justify-center gap-2 flex-wrap">
-            <button type="button" id="filePicker"
-    class="inline-flex items-center gap-2 rounded-md border border-blue-700 bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-    style="background-color:#2563eb;color:#fff;border-color:#1d4ed8">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 -ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v10m0 0l-3-3m3 3l3-3M4 20h16"/>
-    </svg>
-    Pilih PDF
-</button>
-
-    </div>
-
-    <p class="mt-3 text-gray-700">
-        Kamu bisa memilih <b>banyak file PDF sekaligus</b> (hold <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> saat memilih).
-        Atau, <b>tarik & letakkan</b> file ke area ini.
-    </p>
-    <p class="text-xs text-gray-500 mt-1">Maks 300 file • PDF saja • 20 MB per file</p>
-</div>
-
-
-                    {{-- Info ringkas --}}
-                    <div id="stats" class="hidden mt-4 text-sm text-gray-700">
-                        <div class="inline-flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 px-3 py-1.5">
-                            <span id="count">0</span> file dipilih
-                            <span class="text-gray-400">•</span>
-                            total <span id="totalSize">0 B</span>
+                    {{-- Info ringkas dengan tombol "Bersihkan" yang jelas --}}
+                    <div id="stats" class="hidden mt-4 flex items-center gap-3">
+                        <div class="inline-flex items-center gap-2 rounded-lg bg-slate-100 border border-slate-200 px-3 py-1.5 text-base text-slate-800">
+                            <span id="count" class="font-bold">0</span> file dipilih
+                            <span class="text-gray-300">•</span>
+                            total <span id="totalSize" class="font-bold">0 B</span>
                         </div>
-                        <button id="clearBtn" type="button"
-                                class="ml-2 text-gray-600 hover:text-gray-800 underline decoration-dotted">
-                            bersihkan
+                        <button id="clearBtn" type="button" class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-red-600 font-semibold">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                             </svg>
+                            Bersihkan
                         </button>
                     </div>
 
-                    {{-- Preview tabel --}}
-                    <div id="previewWrap" class="hidden mt-4 overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-gray-50 text-gray-600">
+                    {{-- Preview tabel dengan header lebih jelas --}}
+                    <div id="previewWrap" class="hidden mt-4 overflow-x-auto border border-gray-200 rounded-lg">
+                        <table class="min-w-full text-base">
+                            <thead class="bg-slate-100 text-sm font-bold text-slate-800 uppercase tracking-wider">
                                 <tr>
-                                    <th class="text-left py-2 px-3">File</th>
-                                    <th class="text-left py-2 px-3">NPWP (deteksi)</th>
-                                    <th class="text-left py-2 px-3">Periode (deteksi)</th>
-                                    <th class="text-left py-2 px-3">Nama PT (opsional)</th>
-                                    <th class="text-left py-2 px-3">Ukuran</th>
-                                    <th class="text-left py-2 px-3">Status</th>
+                                    <th class="text-left py-3 px-3">File</th>
+                                    <th class="text-left py-3 px-3">NPWP (deteksi)</th>
+                                    <th class="text-left py-3 px-3">Periode (deteksi)</th>
+                                    <th class="text-left py-3 px-3">Ukuran</th>
+                                    <th class="text-left py-3 px-3">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="previewBody" class="divide-y"></tbody>
                         </table>
                     </div>
 
-                    <div class="mt-5 flex items-center gap-3">
-                        <x-primary-button id="submitBtn" disabled>Mulai Upload</x-primary-button>
-                        <span class="text-xs text-gray-500">Pastikan kolom “deteksi” sudah masuk akal sebelum mengunggah.</span>
+                    <div class="mt-6 flex items-center gap-4">
+                        <x-primary-button id="submitBtn" disabled class="px-6 py-3 text-base font-bold">Mulai Upload</x-primary-button>
+                        <span class="text-sm text-gray-500">Pastikan kolom deteksi sudah benar sebelum mengunggah.</span>
                     </div>
                 </form>
             </div>
 
-            {{-- Hasil proses --}}
+            {{-- Hasil proses dengan header yang lebih jelas --}}
             @if (session('results'))
                 @php $res = session('results'); @endphp
-                <div class="bg-white shadow-sm sm:rounded-2xl p-6 border border-gray-100">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-semibold text-gray-800">Hasil Proses</h3>
-                        <div class="flex items-center gap-2 text-sm">
-                            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                Berhasil: {{ count($res['success'] ?? []) }}
-                            </span>
-                            <span class="px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-100">
-                                Gagal: {{ count($res['failed'] ?? []) }}
-                            </span>
+                <div class="bg-white shadow-lg sm:rounded-2xl border border-gray-100">
+                    <div class="p-6 border-b border-gray-200 bg-slate-50 rounded-t-2xl">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-lg text-gray-900">Hasil Proses Upload</h3>
+                            <div class="flex items-center gap-2 text-sm font-semibold">
+                                <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                    Berhasil: {{ count($res['success'] ?? []) }}
+                                </span>
+                                <span class="px-2.5 py-1 rounded-full bg-red-100 text-red-800 border border-red-200">
+                                    Gagal: {{ count($res['failed'] ?? []) }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-
-                    @if (!empty($res['success']))
-                        <div class="mt-4 overflow-x-auto">
-                            <table class="min-w-full text-sm">
-                                <thead class="bg-emerald-50 text-emerald-700">
-                                    <tr>
-                                        <th class="text-left py-2 px-3">File</th>
-                                        <th class="text-left py-2 px-3">Vendor</th>
-                                        <th class="text-left py-2 px-3">NPWP</th>
-                                        <th class="text-left py-2 px-3">Periode</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y">
-                                    @foreach ($res['success'] as $row)
+                    
+                    <div class="p-6 space-y-6">
+                        @if (!empty($res['success']))
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-base">
+                                    <thead class="bg-emerald-100 text-sm font-bold text-emerald-800">
                                         <tr>
-                                            <td class="py-2 px-3">{{ $row['name'] }}</td>
-                                            <td class="py-2 px-3">{{ $row['vendor'] }}</td>
-                                            <td class="py-2 px-3">{{ $row['npwp'] }}</td>
-                                            <td class="py-2 px-3">{{ $row['period'] }}</td>
+                                            <th class="text-left py-3 px-3">File</th>
+                                            <th class="text-left py-3 px-3">Vendor</th>
+                                            <th class="text-left py-3 px-3">Periode</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
+                                    </thead>
+                                    <tbody class="divide-y">
+                                        @foreach ($res['success'] as $row)
+                                            <tr>
+                                                <td class="py-3 px-3">{{ $row['name'] }}</td>
+                                                <td class="py-3 px-3">{{ $row['vendor'] }}</td>
+                                                <td class="py-3 px-3">{{ $row['period'] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
 
-                    @if (!empty($res['failed']))
-                        <div class="mt-6 overflow-x-auto">
-                            <table class="min-w-full text-sm">
-                                <thead class="bg-red-50 text-red-700">
-                                    <tr>
-                                        <th class="text-left py-2 px-3">File</th>
-                                        <th class="text-left py-2 px-3">Alasan</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y">
-                                    @foreach ($res['failed'] as $row)
+                        @if (!empty($res['failed']))
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-base">
+                                    <thead class="bg-red-100 text-sm font-bold text-red-800">
                                         <tr>
-                                            <td class="py-2 px-3">{{ $row['name'] }}</td>
-                                            <td class="py-2 px-3">{{ $row['reason'] }}</td>
+                                            <th class="text-left py-3 px-3">File</th>
+                                            <th class="text-left py-3 px-3">Alasan Gagal</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
+                                    </thead>
+                                    <tbody class="divide-y">
+                                        @foreach ($res['failed'] as $row)
+                                            <tr>
+                                                <td class="py-3 px-3">{{ $row['name'] }}</td>
+                                                <td class="py-3 px-3">{{ $row['reason'] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             @endif
 
         </div>
     </div>
 
-    {{-- === Script: drag&drop + preview + parser BLU/BPU === --}}
+    {{-- Script JavaScript tidak perlu diubah --}}
+    @push('scripts')
     <script>
+        // Script Anda yang sudah ada di sini
         (function(){
             const dz = document.getElementById('dropzone');
             const picker = document.getElementById('filePicker');
@@ -206,29 +207,18 @@
                 return bytes.toFixed(1) + ' ' + units[i];
             }
 
-            // Parser JS yang sejalan dengan server
             function parseName(filename) {
                 const stem = filename.replace(/\.[^.]+$/,'').trim();
-
-                // prefix BLU_ atau BPU_
                 const m0 = stem.match(/^(?:BLU|BPU)[\s_\-]+(.+)$/i);
                 if (!m0) return null;
                 let tail = m0[1].trim();
-
-                // NPWP tepat setelah prefix
                 const m1 = tail.match(/^(\d{8,20})(.*)$/);
                 if (!m1) return null;
                 const npwp = (m1[1] || '').replace(/\D/g,'');
                 const after = (m1[2] || '').trim();
-
-                // Cari periode
                 let period = null;
-
-                // 1) YYYY-MM
                 let ym = after.match(/\b((?:19|20)\d{2})-(0[1-9]|1[0-2])\b/);
                 if (ym) period = ym[1] + '-' + ym[2];
-
-                // 2) Pair MM YYYY atau YYYY MM
                 if (!period) {
                     const tokens = after.split(/[\s_\-]+/).filter(Boolean);
                     for (let i=0;i<tokens.length-1 && !period;i++) {
@@ -237,12 +227,10 @@
                         const isYY  = /^(?:19|20)\d{2}$/.test(b);
                         const isYY2 = /^(?:19|20)\d{2}$/.test(a);
                         const isMM2 = /^(0[1-9]|1[0-2])$/.test(b);
-                        if (isMM && isYY)        period = b + '-' + a;
+                        if (isMM && isYY) period = b + '-' + a;
                         else if (isYY2 && isMM2) period = a + '-' + b;
                     }
                 }
-
-                // 3) Substring 8 digit DDMMYYYY (termasuk di token panjang)
                 if (!period) {
                     const found = after.match(/\d{8}/g);
                     if (found) {
@@ -255,8 +243,6 @@
                         }
                     }
                 }
-
-                // 4) Substring 6 digit YYYYMM atau MMYYYY
                 if (!period) {
                     const found6 = after.match(/\d{6}/g);
                     if (found6) {
@@ -268,12 +254,8 @@
                         }
                     }
                 }
-
                 if (!npwp || !period) return null;
-
-                // vendorName opsional (kasar: buang angka)
-                const vendorName = after.replace(/\d+/g,' ').trim();
-                return { npwp, period, vendorName };
+                return { npwp, period };
             }
 
             function renderPreview(files) {
@@ -286,53 +268,58 @@
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-gray-50/70';
                     tr.innerHTML = `
-                        <td class="py-2 px-3">${f.name}</td>
-                        <td class="py-2 px-3 ${ok?'':'text-red-600'}">${ok?meta.npwp:'—'}</td>
-                        <td class="py-2 px-3 ${ok?'':'text-red-600'}">${ok?meta.period:'Tidak terdeteksi'}</td>
-                        <td class="py-2 px-3">${ok?meta.vendorName:'—'}</td>
-                        <td class="py-2 px-3">${fmtSize(f.size)}</td>
-                        <td class="py-2 px-3">
+                        <td class="py-3 px-3">${f.name}</td>
+                        <td class="py-3 px-3 ${ok ? 'font-mono text-slate-700' : 'text-red-600 font-semibold'}">${ok ? meta.npwp : '—'}</td>
+                        <td class="py-3 px-3 ${ok ? 'font-mono text-slate-700' : 'text-red-600 font-semibold'}">${ok ? meta.period : 'Tidak terdeteksi'}</td>
+                        <td class="py-3 px-3">${fmtSize(f.size)}</td>
+                        <td class="py-3 px-3">
                             ${ok
-                                ? '<span class="text-emerald-700 bg-emerald-50 border border-emerald-100 text-xs px-2 py-0.5 rounded">OK</span>'
-                                : '<span class="text-red-700 bg-red-50 border border-red-100 text-xs px-2 py-0.5 rounded">Nama tidak sesuai</span>'}
+                                ? '<span class="text-emerald-800 bg-emerald-100 border border-emerald-200 text-sm font-semibold px-2.5 py-0.5 rounded-full">OK</span>'
+                                : '<span class="text-red-800 bg-red-100 border border-red-200 text-sm font-semibold px-2.5 py-0.5 rounded-full">Nama tidak sesuai</span>'}
                         </td>
                     `;
                     previewBody.appendChild(tr);
                 });
                 countEl.textContent = files.length;
                 totalEl.textContent = fmtSize(total);
-                stats.classList.toggle('hidden', files.length===0);
-                previewWrap.classList.toggle('hidden', files.length===0);
-                submitBtn.disabled = files.length===0;
+                stats.classList.toggle('hidden', files.length === 0);
+                previewWrap.classList.toggle('hidden', files.length === 0);
+                submitBtn.disabled = files.length === 0;
             }
 
-            // click picker
-            picker.addEventListener('click', ()=> input.click());
-            clearBtn.addEventListener('click', ()=>{
+            picker.addEventListener('click', () => input.click());
+            clearBtn.addEventListener('click', () => {
                 input.value = '';
                 renderPreview([]);
             });
-
-            // change input
-            input.addEventListener('change', ()=> renderPreview(input.files));
-
-            // drag&drop
-            ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e=>{
-                e.preventDefault(); e.stopPropagation();
+            input.addEventListener('change', () => renderPreview(input.files));
+            ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => {
+                e.preventDefault();
+                e.stopPropagation();
                 dz.classList.remove('border-gray-300','bg-gray-50');
-                dz.classList.add('border-blue-500','bg-blue-50');
+                dz.classList.add('border-sky-500','bg-sky-50', 'ring-4', 'ring-sky-200');
             }));
-            ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e=>{
-                e.preventDefault(); e.stopPropagation();
-                dz.classList.remove('border-blue-500','bg-blue-50');
+            ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => {
+                e.preventDefault();
+                e.stopPropagation();
+                dz.classList.remove('border-sky-500','bg-sky-50', 'ring-4', 'ring-sky-200');
                 dz.classList.add('border-gray-300','bg-gray-50');
             }));
-            dz.addEventListener('drop', e=>{
+            dz.addEventListener('drop', e => {
                 const dt = e.dataTransfer;
                 if (!dt || !dt.files) return;
-                input.files = dt.files;
+                
+                // Filter hanya untuk PDF
+                const pdfFiles = Array.from(dt.files).filter(file => file.type === "application/pdf");
+                
+                // Buat DataTransfer baru untuk menyimpan file yang difilter
+                const dataTransfer = new DataTransfer();
+                pdfFiles.forEach(file => dataTransfer.items.add(file));
+
+                input.files = dataTransfer.files;
                 renderPreview(input.files);
             });
         })();
     </script>
+    @endpush
 </x-app-layout>

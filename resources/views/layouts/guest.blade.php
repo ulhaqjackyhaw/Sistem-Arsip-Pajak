@@ -28,10 +28,10 @@
 
             <div class="text-center mb-8">
                 <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-                    SIAJAK
+                    BUPORT
                 </h1>
                 <p class="mt-4 text-lg text-slate-300" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-                    Sistem Arsip Pajak Angkasa Pura Indonesia
+                    Bukti Potong Pajak Injourney Airport
                 </p>
             </div>
 
