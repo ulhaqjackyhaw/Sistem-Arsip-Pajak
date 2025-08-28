@@ -17,7 +17,18 @@ class Vendor extends Model
 
     public function latestDocument(): HasOne
     {
-        // dokumen terbaru berdasar created_at
         return $this->hasOne(Document::class, 'vendor_id')->latestOfMany('created_at');
+    }
+
+    // Jika skema lama: vendors.user_id -> users.id
+    public function userByUserId(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    // Jika skema baru: users.vendor_id -> vendors.id
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'vendor_id', 'id');
     }
 }

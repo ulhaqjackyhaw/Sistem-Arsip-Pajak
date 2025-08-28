@@ -106,20 +106,74 @@ class VendorController extends Controller
     }
 
     public function update(Request $request, Vendor $vendor)
-    {
-        $data = $request->validate([
-            'name'  => ['required','string','max:255'],
-            'npwp'  => ['required','string','max:32', Rule::unique('vendors','npwp')->ignore($vendor->id)],
-            'email' => ['nullable','email','max:255', Rule::unique('vendors','email')->ignore($vendor->id)],
-            'notes' => ['nullable','string','max:1000'],
-        ]);
+{
+    // Simpan NPWP lama sebagai kunci fallback
+    $oldNpwp = preg_replace('/\D/', '', (string) $vendor->npwp);
 
-        $data['npwp'] = preg_replace('/\D/','', (string) $data['npwp']);
+    // Normalisasi email (opsional tapi baik)
+    if ($request->filled('email')) {
+        $request->merge(['email' => strtolower(trim($request->email))]);
+    }
 
+    // Cek: apakah vendor ini SUDAH punya akun user?
+    // (lewat vendor_id atau user_id)
+    $relatedUserId =
+        $vendor->user()->value('id') ?:        // users.vendor_id == vendor.id
+        $vendor->userByUserId()->value('id');  // vendors.user_id == users.id
+
+    // Base rules: unik di vendors saja
+    $rules = [
+        'name'  => ['required','string','max:255'],
+        'npwp'  => ['required','string','max:32', Rule::unique('vendors','npwp')->ignore($vendor->id)],
+        'email' => ['nullable','email','max:255', Rule::unique('vendors','email')->ignore($vendor->id)],
+        'notes' => ['nullable','string','max:1000'],
+    ];
+
+    // Jika vendor ini memang punya akun user, barulah wajib unik juga di users
+    if ($relatedUserId) {
+        $rules['npwp'][]  = Rule::unique('users','npwp')->ignore($relatedUserId);
+        $rules['email'][] = Rule::unique('users','email')->ignore($relatedUserId);
+    }
+
+    $data = $request->validate($rules);
+    $data['npwp'] = preg_replace('/\D/','', (string) $data['npwp']); // digit-only
+
+    DB::transaction(function () use ($vendor, $data, $oldNpwp) {
+        // 1) Update vendor
         $vendor->update($data);
 
-        return redirect()->route('admin.vendors.index')->with('ok','Vendor diperbarui.');
-    }
+        // 2) Cari user terkait:
+        //    - Prioritas users.vendor_id
+        //    - Lalu vendors.user_id (skema lama)
+        //    - Lalu fallback via NPWP lama
+        $user = $vendor->user()->first()
+             ?: $vendor->userByUserId()->first()
+             ?: User::where('npwp', $oldNpwp)->where('role','vendor')->first();
+
+        // 2b) Jika ketemu via NPWP lama, rapikan tautannya:
+        if ($user) {
+            // set users.vendor_id jika belum sesuai
+            if (\Schema::hasColumn('users', 'vendor_id') && $user->vendor_id !== $vendor->id) {
+                $user->vendor_id = $vendor->id;
+            }
+            // set vendors.user_id jika kolomnya masih ada dan belum cocok
+            if (\Schema::hasColumn('vendors', 'user_id') && $vendor->user_id != $user->id) {
+                $vendor->forceFill(['user_id' => $user->id])->save();
+            }
+
+            // 3) Sinkronkan field login di users
+            $user->fill([
+                'name'  => $data['name'],
+                'npwp'  => $data['npwp'],                 // <<< kunci: update NPWP user
+                'email' => $data['email'] ?: $user->email // jangan tiba-tiba null
+            ])->save();
+        }
+    });
+
+    return redirect()->route('admin.vendors.index')
+        ->with('ok','Vendor & akun login (jika ada) berhasil diperbarui.');
+}
+
 
     public function destroy(Vendor $vendor)
     {
