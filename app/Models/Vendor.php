@@ -10,6 +10,25 @@ class Vendor extends Model
 {
     protected $fillable = ['name','npwp','email','notes'];
 
+    /**
+     * The "booted" method of the model.
+     * Ini akan berjalan secara otomatis SETIAP KALI vendor akan dihapus.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::deleting(function ($vendor) {
+            // CARI user yang terhubung dengan cara APAPUN
+            $userToDelete = $vendor->user()->first() ?? $vendor->userByUserId()->first();
+            
+            // Jika user ditemukan, HAPUS user tersebut.
+            if ($userToDelete) {
+                $userToDelete->delete();
+            }
+        });
+    }
+
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class, 'vendor_id');
@@ -20,13 +39,13 @@ class Vendor extends Model
         return $this->hasOne(Document::class, 'vendor_id')->latestOfMany('created_at');
     }
 
-    // Jika skema lama: vendors.user_id -> users.id
+    // Relasi via vendors.user_id -> users.id (Cara Lama)
     public function userByUserId(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    // Jika skema baru: users.vendor_id -> vendors.id
+    // Relasi via users.vendor_id -> vendors.id (Cara Baru & Benar)
     public function user(): HasOne
     {
         return $this->hasOne(User::class, 'vendor_id', 'id');

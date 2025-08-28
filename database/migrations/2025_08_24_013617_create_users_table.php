@@ -14,7 +14,7 @@ $table->string('npwp')->nullable()->index()->after('role');
 
 
 Schema::table('users', function (Blueprint $table) {
-$table->foreignId('vendor_id')->nullable()->after('npwp')->constrained('vendors')->nullOnDelete();
+$table->foreignId('vendor_id')->nullable()->after('npwp')->constrained('vendors')->cascadeOnDelete();
 });
 }
 

@@ -105,7 +105,7 @@ class VendorController extends Controller
         return view('admin.vendors.edit', compact('vendor'));
     }
 
-    public function update(Request $request, Vendor $vendor)
+   public function update(Request $request, Vendor $vendor)
 {
     // Simpan NPWP lama sebagai kunci fallback
     $oldNpwp = preg_replace('/\D/', '', (string) $vendor->npwp);
@@ -176,16 +176,16 @@ class VendorController extends Controller
 
 
     public function destroy(Vendor $vendor)
-    {
-        // Proteksi: cegah hapus jika sudah punya dokumen
-        if (method_exists($vendor, 'documents') && $vendor->documents()->exists()) {
-            return back()->withErrors(['delete'=>'Tidak bisa menghapus: vendor sudah punya dokumen.']);
-        }
-
-        $vendor->delete();
-
-        return back()->with('ok','Vendor dihapus.');
+{
+    // Proteksi: cegah hapus jika sudah punya dokumen
+    if (method_exists($vendor, 'documents') && $vendor->documents()->exists()) {
+        return back()->withErrors(['delete'=>'Tidak bisa menghapus: vendor sudah punya dokumen.']);
     }
+
+    $vendor->delete(); // Logika dari Model Vendor.php akan berjalan di sini
+
+    return back()->with('ok','Vendor dan akun user terkait berhasil dihapus.'); // Perbarui pesannya
+}
 
     public function createAccount(Vendor $vendor, Request $request)
     {
