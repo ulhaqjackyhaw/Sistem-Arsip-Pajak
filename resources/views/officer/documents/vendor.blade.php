@@ -1,4 +1,5 @@
 <x-app-layout>
+    @php $tz = config('app.timezone'); @endphp
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <div class="shrink-0 h-10 w-10 rounded-xl bg-blue-600/10 flex items-center justify-center">
@@ -116,7 +117,9 @@
                                         $isPdf = $ext === 'pdf';
                                     @endphp
                                     <tr class="hover:bg-gray-50/80">
-                                        <td class="py-3 px-3 text-gray-700">{{ $d->created_at->format('Y-m-d H:i') }}</td>
+                                        <td class="py-3 px-3 text-gray-700">
+                                            {{ optional($d->created_at)->timezone($tz)->format('Y-m-d H:i') }}
+                                        </td>
                                         <td class="py-3 px-3">
                                             <span class="px-2 py-0.5 text-xs rounded-md bg-blue-50 text-blue-700 border border-blue-100">
                                                 {{ $d->period }}
@@ -151,7 +154,14 @@
                                                     <span class="text-sm">Download</span>
                                                 </a>
 
-                                                <form action="{{ route('officer.documents.destroy', $d) }}" method="POST" onsubmit="return confirm('Hapus dokumen ini?')">
+                                                {{-- Hapus pakai modal SweetAlert2 --}}
+                                                <form method="POST"
+                                                      action="{{ route('officer.documents.destroy', $d) }}"
+                                                      class="needs-confirmation"
+                                                      data-confirm-title="Hapus Dokumen?"
+                                                      data-confirm-text="Dokumen {{ addslashes($d->original_name ?? $d->stored_name) }} akan dihapus dari server. Tindakan ini tidak dapat dibatalkan."
+                                                      data-confirm-icon="warning"
+                                                      data-confirm-button="Ya, Hapus!">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-200 hover:border-red-600 hover:text-red-700 transition">
@@ -174,4 +184,39 @@
             </div>
         </div>
     </div>
+
+    {{-- SweetAlert2 + handler konfirmasi global --}}
+    @once
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+        document.addEventListener('submit', async function (e) {
+          const form = e.target;
+          if (!form.classList || !form.classList.contains('needs-confirmation')) return;
+          if (form.dataset.confirmed === '1') return; // prevent double
+          e.preventDefault();
+
+          const title  = form.dataset.confirmTitle  || 'Yakin?';
+          const text   = form.dataset.confirmText   || 'Tindakan ini tidak dapat dibatalkan.';
+          const icon   = form.dataset.confirmIcon   || 'warning';
+          const cta    = form.dataset.confirmButton || 'Ya, lanjut';
+          const cancel = form.dataset.cancelButton  || 'Batal';
+
+          if (typeof Swal === 'undefined') {
+            if (confirm(text)) { form.dataset.confirmed='1'; form.submit(); }
+            return;
+          }
+
+          const res = await Swal.fire({
+            title, html: text, icon,
+            showCancelButton: true,
+            confirmButtonText: cta,
+            cancelButtonText: cancel,
+            reverseButtons: true,
+            focusCancel: true
+          });
+
+          if (res.isConfirmed) { form.dataset.confirmed='1'; form.submit(); }
+        }, true);
+        </script>
+    @endonce
 </x-app-layout>
