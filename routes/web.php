@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VendorLoginController;
 use App\Http\Controllers\Vendor\DocumentController;
+use App\Http\Controllers\Officer\DashboardController;
 
 use App\Http\Controllers\Admin\VendorController as AdminVendor;
 use App\Http\Controllers\Officer\DocumentController as OfficerDoc;
@@ -68,6 +69,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':officer,admin'])
         // Bulk upload
         Route::get('bulk', [Bulk::class, 'form'])->name('bulk.form');
         Route::post('bulk', [Bulk::class, 'upload'])->name('bulk.upload');
+
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     });
 
 // ===================== VENDOR =====================
