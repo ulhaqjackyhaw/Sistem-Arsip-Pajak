@@ -30,18 +30,43 @@
                 <x-input-error :messages="$errors->get('npwp')" class="mt-2 text-red-400" />
             </div>
 
-            {{-- Password Input --}}
-            <div>
+            {{-- Password Input (dengan tombol mata) --}}
+            <div x-data="{ show: false }">
                 <x-input-label for="password" value="Password" class="text-white" />
+
                 <div class="relative mt-2">
+                    {{-- ikon gembok kiri --}}
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        {{-- Ikon Gembok --}}
                         <svg class="h-5 w-5 text-indigo-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <x-text-input id="password" name="password" type="password" class="block w-full pl-10 bg-white/5 border-white/20 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500" required />
+
+                    {{-- input password (toggle type) --}}
+                    <x-text-input id="password"
+                        x-bind:type="show ? 'text' : 'password'"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                        class="block w-full pl-10 pr-10 bg-white/5 border-white/20 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500" />
+
+                    {{-- tombol mata kanan --}}
+                    <button type="button"
+                            @click="show = !show"
+                            :aria-label="show ? 'Sembunyikan password' : 'Lihat password'"
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-indigo-300 hover:text-white">
+                        {{-- eye --}}
+                        <svg x-show="!show" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        {{-- eye-off --}}
+                        <svg x-show="show" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18M10.477 10.477A3 3 0 0012 15a3 3 0 002.523-4.523M9.88 9.88A5 5 0 0112 7c4.477 0 8.268 2.943 9.542 7a9.967 9.967 0 01-4.132 4.132M6.228 6.228A9.969 9.969 0 002.458 12c1.274 4.057 5.065 7 9.542 7 1.121 0 2.2-.184 3.204-.523"/>
+                        </svg>
+                    </button>
                 </div>
+
                 <x-input-error :messages="$errors->get('password')" class="mt-2 text-red-400" />
             </div>
 
@@ -64,11 +89,14 @@
         </form>
 
         {{-- Link to Petugas/Admin login --}}
-        <p class="mt-8 text-center text-white text-sm text-gray-500">
+        {{-- <p class="mt-8 text-center text-white text-sm text-gray-500">
             Bukan Vendor?
             <a href="{{ route('login') }}" class="font-semibold leading-6 text-white-600 hover:text-indigo-500">
                 Login sebagai Petugas / Admin
             </a>
-        </p>
+        </p> --}}
     </div>
+    
 </x-guest-layout>
+<style>[x-cloak]{display:none!important}</style>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

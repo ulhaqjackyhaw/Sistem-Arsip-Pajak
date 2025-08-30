@@ -73,13 +73,13 @@
                         {{-- Pencarian + filter dengan tombol yang dipertegas --}}
                         <form method="GET" class="mt-3 sm:mt-0">
                             <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                                <div class="relative">
+                                {{-- <div class="relative">
                                     <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3M10 18a8 8 0 100-16 8 8 0 000 16z"/>
                                     </svg>
                                     <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama file…"
                                            class="w-full rounded-lg border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:ring-blue-500/50 sm:w-64 shadow-sm">
-                                </div>
+                                </div> --}}
                                 <input type="month" name="period" value="{{ request('period') }}"
                                        class="rounded-lg border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500/50 shadow-sm">
                                 <button class="inline-flex items-center justify-center rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">

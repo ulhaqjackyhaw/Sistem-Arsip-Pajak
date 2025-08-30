@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDocumentRequest;
 use App\Models\Document;
 use App\Models\Vendor;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,11 +15,11 @@ class DocumentController extends Controller
 {
     /**
      * Daftar vendor untuk unggah/lihat dokumen.
-     * - Support pencarian ?q= (NPWP / Nama)
-     * - Hitung jumlah dokumen per vendor (documents_count)
-     * - Ambil waktu unggah terakhir via relasi latestDocument (aman dari kolom ambigu)
+     * - Pencarian ?q= (NPWP/Nama)
+     * - withCount('documents') + latestDocument (kolom minimal)
+     * - HTMX: bila HX-Request → balas partial tabel saja
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $q = trim($request->get('q', ''));
 
@@ -28,29 +27,45 @@ class DocumentController extends Controller
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($w) use ($q) {
                     $w->where('npwp', 'like', "%{$q}%")
-                        ->orWhere('name', 'like', "%{$q}%");
+                      ->orWhere('name', 'like', "%{$q}%");
                 });
             })
             ->withCount('documents')
             ->with([
-                'latestDocument' => function ($q) {
-                    // prefix nama kolom agar tidak "ambiguous"
-                    $q->select('documents.id', 'documents.vendor_id', 'documents.created_at');
-                }
+                'latestDocument' => function ($sub) {
+                    // pilih kolom minimal agar tidak ambiguous
+                    $sub->select('documents.id', 'documents.vendor_id', 'documents.created_at');
+                },
             ])
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString();
 
-        return view('officer.documents.index', compact('vendors', 'q'));
+        // Jika request dari HTMX → kirim PARTIAL tabel saja
+        if ($request->header('HX-Request')) {
+            return view('officer.partials.vendor_table', [
+                'vendors' => $vendors,
+                'q'       => $q,
+            ]);
+        }
+
+        // Akses normal → kirim HALAMAN penuh
+        return view('officer.documents.index', [
+            'vendors' => $vendors,
+            'q'       => $q,
+        ]);
     }
 
     /**
      * Halaman dokumen per vendor.
      */
-    public function showVendor(Vendor $vendor): View
+    public function showVendor(Vendor $vendor)
     {
-        $docs = $vendor->documents()->latest()->paginate(20);
+        $docs = $vendor->documents()
+            ->with('uploader')   // dipakai di blade: $d->uploader->name
+            ->latest()
+            ->paginate(20);
+
         return view('officer.documents.vendor', compact('vendor', 'docs'));
     }
 
@@ -60,47 +75,47 @@ class DocumentController extends Controller
     public function store(StoreDocumentRequest $request): RedirectResponse
     {
         $vendor = Vendor::findOrFail($request->vendor_id);
-        $file = $request->file('file');
+        $file   = $request->file('file');
 
         // Hash sebelum dipindah (stabil)
-        $sha256 = hash_file('sha256', $file->getRealPath());
+        $sha256     = hash_file('sha256', $file->getRealPath());
         $storedName = uniqid('doc_') . '.' . $file->getClientOriginalExtension();
-        $dir = "bukti_pajak/{$vendor->npwp}/{$request->period}";
+        $dir        = "bukti_pajak/{$vendor->npwp}/{$request->period}";
 
         // Simpan ke disk "private"
         $path = $file->storeAs($dir, $storedName, 'private');
 
         // Simpan metadata
         Document::create([
-            'vendor_id' => $vendor->id,
-            'uploaded_by' => $request->user()->id,
-            'period' => $request->period,
+            'vendor_id'     => $vendor->id,
+            'uploaded_by'   => $request->user()->id,
+            'period'        => $request->period,
             'original_name' => $file->getClientOriginalName(),
-            'stored_name' => $storedName,
-            'mime' => $file->getMimeType() ?: $file->getClientMimeType(),
-            'size' => $file->getSize(),
-            'hash' => $sha256,
-            'path' => $path,     // contoh: bukti_pajak/NPWP/2025-08/doc_xxx.pdf
-            // 'disk'       => 'private', // hanya isi jika kolom 'disk' memang ada di tabel
+            'stored_name'   => $storedName,
+            'mime'          => $file->getMimeType() ?: $file->getClientMimeType(),
+            'size'          => $file->getSize(),
+            'hash'          => $sha256,
+            'path'          => $path, // contoh: bukti_pajak/NPWP/2025-08/doc_xxx.pdf
+            // 'disk'        => 'private', // isi hanya bila kolom 'disk' ada
         ]);
 
         return back()->with('ok', 'Dokumen tersimpan');
     }
 
     /**
-     * Unduh dokumen secara privat (via controller).
+     * Unduh dokumen secara privat.
      */
     public function download(Document $document): BinaryFileResponse
     {
         $disk = $document->disk ?? 'private';
 
-        if (!Storage::disk($disk)->exists($document->path)) {
+        if (! Storage::disk($disk)->exists($document->path)) {
             abort(404, 'File tidak ditemukan.');
         }
 
         $downloadName = $document->original_name ?: $document->stored_name;
+        $filePath     = Storage::disk($disk)->path($document->path);
 
-        $filePath = Storage::disk($disk)->path($document->path);
         return response()->download($filePath, $downloadName);
     }
 

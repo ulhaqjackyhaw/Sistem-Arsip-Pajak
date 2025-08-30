@@ -1,15 +1,13 @@
 {{-- resources/views/layouts/navigation.blade.php --}}
 <nav class="bg-white shadow-sm border-b border-sky-200" x-data="{ open: false }">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">
             {{-- Kiri: Logo & Menu Utama (Desktop) --}}
             <div class="flex">
                 {{-- Logo --}}
                 <div class="flex flex-shrink-0 items-center">
                     <a href="{{ route('home') }}">
-                        <svg class="h-8 w-auto text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" />
-                        </svg>
+                    <img src="{{ asset('images/logo.png') }}" alt="BUPORT" class="h-8 w-auto">
                     </a>
                 </div>
 
@@ -194,3 +192,4 @@
         </div>
     </div>
 </nav>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
