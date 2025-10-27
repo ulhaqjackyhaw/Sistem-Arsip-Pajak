@@ -1,12 +1,14 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
+// vite.config.js
+import { defineConfig } from 'vite'
+import laravel from 'laravel-vite-plugin'
 
 export default defineConfig({
   server: {
-    host: '0.0.0.0', // Agar bisa diakses dari perangkat lain
-    port: 8000,       // Sesuaikan port yang Anda gunakan
+    host: true,
+    port: 5173,
+    strictPort: true,
     hmr: {
-      host: '192.168.0.18', // IP Laptop 1 jika menggunakan HMR
+      port: 5173,
     },
   },
   plugins: [
@@ -15,4 +17,4 @@ export default defineConfig({
       refresh: true,
     }),
   ],
-});
+})
