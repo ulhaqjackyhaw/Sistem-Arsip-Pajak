@@ -9,18 +9,30 @@ Sistem ini membantu proses administrasi bukti potong pajak agar lebih rapi, aman
 
 ## Peran Pengguna
 
-### 1. Tax Officer / Admin
-Pengguna dengan peran admin atau tax officer berfungsi sebagai pengelola utama sistem. Mereka dapat:
+### 1. Admin
+Admin berfungsi sebagai pengelola data master dan akun pengguna. Admin juga memiliki seluruh akses operasional tax officer. Admin dapat:
 
 - melihat daftar vendor
 - menambah, mengubah, dan menghapus data vendor
 - membuat akun vendor
 - mereset password akun vendor
+- mengelola impor dan ekspor data vendor
+- melihat detail vendor
 - mengunggah dokumen bukti potong pajak
 - menghapus dokumen yang tidak diperlukan
 - melakukan unggah dokumen secara massal
+- mengunduh dokumen sesuai kebutuhan operasional
 
-### 2. Vendor
+### 2. Tax Officer
+Tax officer berfungsi sebagai petugas operasional dokumen. Tax officer dapat:
+
+- melihat daftar vendor dan detail vendor
+- mengunggah dokumen bukti potong pajak
+- menghapus dokumen yang tidak diperlukan
+- melakukan unggah dokumen secara massal
+- mengunduh dokumen sesuai kebutuhan operasional
+
+### 3. Vendor
 Vendor adalah pihak yang menerima dan mengunduh dokumen bukti potong pajak miliknya sendiri. Vendor dapat:
 
 - login menggunakan akun vendor
@@ -32,7 +44,7 @@ Vendor adalah pihak yang menerima dan mengunduh dokumen bukti potong pajak milik
 
 1. Admin atau tax officer menambahkan data vendor ke dalam sistem.
 2. Sistem membuat akun vendor berdasarkan data tersebut.
-3. Tax officer mengunggah dokumen bukti potong pajak ke vendor yang sesuai.
+3. Admin atau tax officer mengunggah dokumen bukti potong pajak ke vendor yang sesuai.
 4. Dokumen disimpan di storage privat berdasarkan vendor dan periode.
 5. Vendor login untuk melihat arsip dokumen miliknya.
 6. Vendor dapat mengunduh dokumen satu per satu atau dalam bentuk file ZIP.
@@ -40,7 +52,7 @@ Vendor adalah pihak yang menerima dan mengunduh dokumen bukti potong pajak milik
 ## Fitur Utama
 
 - autentikasi pengguna dengan pembagian peran
-- proteksi akses berdasarkan role
+- proteksi akses berdasarkan role, dengan admin mendapat akses operasional tax officer
 - manajemen data vendor
 - upload dokumen bukti potong pajak
 - penyimpanan dokumen privat
@@ -63,3 +75,4 @@ Vendor adalah pihak yang menerima dan mengunduh dokumen bukti potong pajak milik
 - `vendors` menyimpan data vendor dan NPWP
 - `documents` menyimpan metadata file bukti potong pajak
 
+.....
